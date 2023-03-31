@@ -10,7 +10,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
-import {createDataRows, createHeaders} from "./utils";
+import {colorArray, createDataRows, createHeaders} from "./utils";
 
 ChartJS.register(
     CategoryScale,
@@ -22,58 +22,28 @@ ChartJS.register(
     Legend
 );
 
+let datapointsCount = 10
+const labels = Array.from(Array(datapointsCount).keys())
+
+function generateData() {
+    return Array.from(Array(5).keys()).map((label) => {
+        const color = colorArray[Math.ceil(Math.random() * 50)]
+        return {
+            data: [0, ...Array.from(Array(datapointsCount).keys()).map(() => Math.random() * 100)],
+            borderColor: color,
+            backgroundColor: color,
+            label: label,
+            checked: true,
+        };
+    });
+}
+
 export const options = {
     responsive: true,
     interaction: {
         mode: 'index',
         intersect: false,
     },
-    stacked: false,
-    plugins: {
-        title: {
-            display: true,
-            text: 'Chart.js Line Chart - Multi Axis',
-        },
-    },
-    scales: {
-        y: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-        },
-        y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            grid: {
-                drawOnChartArea: false,
-            },
-        },
-    },
-};
-
-const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-
-export const data = {
-    labels,
-    datasets: [
-        {
-            label: 'Dataset 1',
-            data: labels.map(() => Math.random() * 1000),
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            yAxisID: 'y',
-            checked: true,
-        },
-        {
-            label: 'Dataset 2',
-            data: labels.map(() => Math.random() * 1000),
-            borderColor: 'rgb(53, 162, 235)',
-            backgroundColor: 'rgba(53, 162, 235, 0.5)',
-            yAxisID: 'y1',
-            checked: true
-        },
-    ],
 };
 
 
@@ -87,7 +57,7 @@ const LineChart = (props) => {
 
 
 export default function LineChartWrapper() {
-    let initialDataSet = [...data.datasets]
+    let initialDataSet = generateData()
     let [dataSets, setDataSets] = useState(initialDataSet);
     const handleDelete = (id) => {
         let updatedData = dataSets.filter((d) => d.label !== id);
@@ -120,7 +90,7 @@ export default function LineChartWrapper() {
     return (
         <div style={{width: '1000px', margin: '30px'}}>
             <h1>Line Chart with custom selectors</h1>
-            <LineChart data={{...data, datasets: dataSets.filter(d => d.checked)}}/>
+            <LineChart data={{labels, datasets: dataSets.filter(d => d.checked)}}/>
             {createIndexTable()}
         </div>
     );
